@@ -118,19 +118,21 @@ new ApolloError(message, code, additionalProperties);
 
 ## Masking and logging errors
 
-The Apollo server constructor accepts a `formatError` function that is run on each error passed back to the client. This can be used to mask errors as well as for logging.
+The Apollo server constructor accepts a `rewriteError` function that is run on each error passed back to the client. This can be used to mask errors as well as for logging.
 This example demonstrates masking (or suppressing the stacktrace):
 
-```js line=4-10
+```js line=4-11
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  formatError: error => {
-    console.log(error);
-    return new Error('Internal server error');
-    // Or, you can delete the exception information
-    // delete error.extensions.exception;
-    // return error;
+  rewriteError: error => {
+    return new GraphQLError('Renamed error');
+
+    //Or you can delete the error
+    return null;
+
+    //Or you can return the original error to be reported
+    return error;
   },
 });
 
